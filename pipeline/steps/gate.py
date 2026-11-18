@@ -16,9 +16,51 @@ Tỉ lệ cảnh báo = (số ẢNH khác nhau có ≥ 1 cảnh báo) / (tổng 
 
 Trả về dict: decision, n_errors, n_warn_images, n_images, warn_ratio (làm tròn 4 chữ số), reasons (list[str], giải thích bằng tiếng Việt, có số liệu).
 """
-from ..common import ERROR, WARN  # noqa: F401
+from ..common import ERROR, WARN
 
 
 def decide(issues, image_stems, cfg, reviewed=frozenset()):
-    # TODO
-    raise NotImplementedError("gate chưa làm")
+    warn_ratio_hold = cfg["gate"]["warn_ratio_hold"]
+    valid_stems = set(image_stems)
+    reviewed_set = set(reviewed) if reviewed else set()
+
+    # Đếm lỗi ERROR trên các ảnh hợp lệ trong dataset — kể cả ảnh đã reviewed
+    n_errors = sum(1 for i in issues if i.severity == ERROR and i.image in valid_stems)
+
+    # Đếm các ảnh khác nhau có WARN — bỏ qua ảnh đã reviewed và ngoài dataset
+    warn_images = {
+        i.image for i in issues
+        if i.severity == WARN
+        and i.image in valid_stems
+        and i.image not in reviewed_set
+    }
+
+    n_images = len(image_stems)
+    n_warn_images = len(warn_images)
+    warn_ratio = round(n_warn_images / n_images, 4) if n_images > 0 else 0.0
+
+    if n_errors > 0:
+        decision = "Rework"
+        reasons = [f"còn {n_errors} lỗi bắt buộc (ERROR) chưa được sửa"]
+    elif warn_ratio >= warn_ratio_hold:
+        decision = "Hold"
+        reasons = [
+            f"tỉ lệ ảnh có cảnh báo {warn_ratio:.2%} ({n_warn_images}/{n_images} ảnh) >= ngưỡng Hold ({warn_ratio_hold:.2%})"
+        ]
+    else:
+        decision = "Release"
+        if n_images == 0:
+            reasons = ["tập dữ liệu không có ảnh, không có lỗi"]
+        else:
+            reasons = [
+                f"không còn lỗi bắt buộc, tỉ lệ ảnh có cảnh báo {warn_ratio:.2%} ({n_warn_images}/{n_images} ảnh) < ngưỡng Hold ({warn_ratio_hold:.2%})"
+            ]
+
+    return {
+        "decision": decision,
+        "n_errors": n_errors,
+        "n_warn_images": n_warn_images,
+        "n_images": n_images,
+        "warn_ratio": warn_ratio,
+        "reasons": reasons,
+    }
