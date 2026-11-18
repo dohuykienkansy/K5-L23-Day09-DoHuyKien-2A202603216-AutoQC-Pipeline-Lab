@@ -35,10 +35,124 @@ Gợi ý
 - `iou_xywh` có sẵn. Dòng nhãn hỏng không được làm script chết (dùng `ds.valid_boxes` và `parse_yolo_line` trong try).
 - Kết quả phụ thuộc mạnh vào ngưỡng: calibrate chúng ở Bước 3 thay vì đoán.
 """
-from ..common import WARN, Issue, iou_xywh, parse_yolo_line  # noqa: F401
-from ..model_cache import get_preds  # noqa: F401
+from ..common import WARN, Issue, iou_xywh, parse_yolo_line
+from ..model_cache import get_preds
 
 
 def run(ds, cfg, preds=None):
-    # TODO
-    raise NotImplementedError("check second_opinion chưa làm")
+    if preds is None:
+        preds = get_preds(ds, cfg, "checker")
+
+    so_cfg = cfg["second_opinion"]
+    issues = []
+
+    for p in ds.image_files():
+        stem = p.stem
+        if stem not in preds:
+            continue
+        if not ds.label_path(stem).exists():
+            continue
+
+        img_size = ds.image_size(stem)
+        if not img_size:
+            continue
+        W, H = img_size
+
+        # 1. Lọc dự đoán P: conf >= conf VÀ diện tích px >= min_area_px
+        P = [
+            pred for pred in preds[stem]
+            if pred[1] >= so_cfg["conf"]
+            and (pred[4] * W) * (pred[5] * H) >= so_cfg["min_area_px"]
+        ]
+
+        # 2. Danh sách nhãn hợp lệ L
+        L = ds.valid_boxes(stem)
+
+        # 3. So sánh từng dự đoán trong P với các nhãn L
+        for pred in P:
+            pred_cls, pred_conf, pcx, pcy, pw, ph = pred
+            pred_box = (pcx, pcy, pw, ph)
+
+            cands = [
+                (cls_id, (cx, cy, w, h), iou_xywh(pred_box, (cx, cy, w, h)))
+                for cls_id, cx, cy, w, h in L
+                if iou_xywh(pred_box, (cx, cy, w, h)) >= so_cfg["iou_missing"]
+            ]
+
+            same_cls = [c for c in cands if c[0] == pred_cls]
+            diff_cls = [c for c in cands if c[0] != pred_cls]
+
+            if not cands:
+                issues.append(
+                    Issue(
+                        "second_opinion",
+                        WARN,
+                        "POSSIBLE_MISSING",
+                        stem,
+                        f"model dự đoán lớp {pred_cls} (conf={pred_conf:.2f}) nhưng nhãn không có box nào khớp",
+                        line=None,
+                        extra={"conf": pred_conf},
+                    )
+                )
+            elif same_cls:
+                best_same_iou = max(c[2] for c in same_cls)
+                if best_same_iou < so_cfg["iou_loose"]:
+                    issues.append(
+                        Issue(
+                            "second_opinion",
+                            WARN,
+                            "POSSIBLE_LOOSE_BOX",
+                            stem,
+                            f"box nhãn cùng lớp có IoU={best_same_iou:.2f} < {so_cfg['iou_loose']}",
+                            line=None,
+                            extra={"iou": best_same_iou},
+                        )
+                    )
+                # else: nhãn đúng lớp đã phủ tốt -> không cờ
+            else:
+                # Không có cand cùng lớp, chỉ có khác lớp
+                if diff_cls:
+                    best_diff_iou = max(c[2] for c in diff_cls)
+                    if best_diff_iou >= so_cfg["iou_match"]:
+                        issues.append(
+                            Issue(
+                                "second_opinion",
+                                WARN,
+                                "POSSIBLE_WRONG_CLASS",
+                                stem,
+                                f"box nhãn khác lớp nhưng IoU={best_diff_iou:.2f} >= {so_cfg['iou_match']}",
+                                line=None,
+                                extra={"conf": pred_conf},
+                            )
+                        )
+                # else: IoU trong [iou_missing, iou_match) -> mơ hồ, không cờ
+
+        # 4. Kiểm tra POSSIBLE_FALSE_POS cho từng dòng nhãn
+        all_preds_fp = [pred for pred in preds[stem] if pred[1] >= so_cfg["fp_conf"]]
+        raw_lines = ds.read_label_lines(stem) or []
+        for lineno, raw in raw_lines:
+            raw_stripped = raw.strip()
+            if not raw_stripped:
+                continue
+            try:
+                cls_id, cx, cy, w, h = parse_yolo_line(raw_stripped)
+            except ValueError:
+                continue
+
+            if cls_id < 0 or cls_id >= len(ds.classes) or w <= 0 or h <= 0:
+                continue
+
+            label_box = (cx, cy, w, h)
+            if all(iou_xywh(label_box, (pr[2], pr[3], pr[4], pr[5])) < so_cfg["iou_missing"] for pr in all_preds_fp):
+                issues.append(
+                    Issue(
+                        "second_opinion",
+                        WARN,
+                        "POSSIBLE_FALSE_POS",
+                        stem,
+                        f"box nhãn không khớp dự đoán nào của model",
+                        line=lineno,
+                    )
+                )
+
+    return issues
