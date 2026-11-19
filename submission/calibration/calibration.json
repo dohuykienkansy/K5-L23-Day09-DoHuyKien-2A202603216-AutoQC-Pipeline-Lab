@@ -64,12 +64,12 @@
       "n_injected": 3
     },
     "DUP_IMAGE_NEAR": {
-      "tp": 3,
+      "tp": 4,
       "fp": 0,
-      "fn": 3,
+      "fn": 2,
       "precision": 1.0,
-      "recall": 0.5,
-      "f1": 0.667,
+      "recall": 0.667,
+      "f1": 0.8,
       "n_injected": 6
     },
     "MISSING_LABEL_FILE": {
@@ -91,21 +91,21 @@
       "n_injected": 5
     },
     "POSSIBLE_LOOSE_BOX": {
-      "tp": 2,
-      "fp": 5,
-      "fn": 3,
-      "precision": 0.286,
-      "recall": 0.4,
-      "f1": 0.333,
+      "tp": 1,
+      "fp": 4,
+      "fn": 4,
+      "precision": 0.2,
+      "recall": 0.2,
+      "f1": 0.2,
       "n_injected": 5
     },
     "POSSIBLE_MISSING": {
       "tp": 8,
-      "fp": 8,
+      "fp": 6,
       "fn": 0,
-      "precision": 0.5,
+      "precision": 0.571,
       "recall": 1.0,
-      "f1": 0.667,
+      "f1": 0.727,
       "n_injected": 8
     },
     "POSSIBLE_WRONG_CLASS": {
@@ -119,6 +119,134 @@
     }
   },
   "sweeps": {
+    "duplicates.phash_dist": [
+      {
+        "value": 1,
+        "DUP_IMAGE_EXACT": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "n_injected": 3
+        },
+        "DUP_IMAGE_NEAR": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 5,
+          "precision": 1.0,
+          "recall": 0.167,
+          "f1": 0.286,
+          "n_injected": 6
+        }
+      },
+      {
+        "value": 2,
+        "DUP_IMAGE_EXACT": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "n_injected": 3
+        },
+        "DUP_IMAGE_NEAR": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.667,
+          "n_injected": 6
+        }
+      },
+      {
+        "value": 3,
+        "DUP_IMAGE_EXACT": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "n_injected": 3
+        },
+        "DUP_IMAGE_NEAR": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 3,
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.667,
+          "n_injected": 6
+        }
+      },
+      {
+        "value": 4,
+        "DUP_IMAGE_EXACT": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "n_injected": 3
+        },
+        "DUP_IMAGE_NEAR": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1.0,
+          "recall": 0.667,
+          "f1": 0.8,
+          "n_injected": 6
+        }
+      },
+      {
+        "value": 5,
+        "DUP_IMAGE_EXACT": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "n_injected": 3
+        },
+        "DUP_IMAGE_NEAR": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1.0,
+          "recall": 0.667,
+          "f1": 0.8,
+          "n_injected": 6
+        }
+      },
+      {
+        "value": 6,
+        "DUP_IMAGE_EXACT": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "n_injected": 3
+        },
+        "DUP_IMAGE_NEAR": {
+          "tp": 4,
+          "fp": 0,
+          "fn": 2,
+          "precision": 1.0,
+          "recall": 0.667,
+          "f1": 0.8,
+          "n_injected": 6
+        }
+      }
+    ],
     "second_opinion.conf": [
       {
         "value": 0.1,
@@ -138,45 +266,6 @@
           "precision": 0.4,
           "recall": 1.0,
           "f1": 0.571,
-          "n_injected": 8
-        },
-        "POSSIBLE_LOOSE_BOX": {
-          "tp": 3,
-          "fp": 5,
-          "fn": 2,
-          "precision": 0.375,
-          "recall": 0.6,
-          "f1": 0.462,
-          "n_injected": 5
-        },
-        "POSSIBLE_FALSE_POS": {
-          "tp": 5,
-          "fp": 9,
-          "fn": 0,
-          "precision": 0.357,
-          "recall": 1.0,
-          "f1": 0.526,
-          "n_injected": 5
-        }
-      },
-      {
-        "value": 0.15,
-        "POSSIBLE_WRONG_CLASS": {
-          "tp": 5,
-          "fp": 4,
-          "fn": 1,
-          "precision": 0.556,
-          "recall": 0.833,
-          "f1": 0.667,
-          "n_injected": 6
-        },
-        "POSSIBLE_MISSING": {
-          "tp": 8,
-          "fp": 9,
-          "fn": 0,
-          "precision": 0.471,
-          "recall": 1.0,
-          "f1": 0.64,
           "n_injected": 8
         },
         "POSSIBLE_LOOSE_BOX": {
@@ -278,45 +367,6 @@
       },
       {
         "value": 0.3,
-        "POSSIBLE_WRONG_CLASS": {
-          "tp": 5,
-          "fp": 4,
-          "fn": 1,
-          "precision": 0.556,
-          "recall": 0.833,
-          "f1": 0.667,
-          "n_injected": 6
-        },
-        "POSSIBLE_MISSING": {
-          "tp": 8,
-          "fp": 8,
-          "fn": 0,
-          "precision": 0.5,
-          "recall": 1.0,
-          "f1": 0.667,
-          "n_injected": 8
-        },
-        "POSSIBLE_LOOSE_BOX": {
-          "tp": 2,
-          "fp": 4,
-          "fn": 3,
-          "precision": 0.333,
-          "recall": 0.4,
-          "f1": 0.364,
-          "n_injected": 5
-        },
-        "POSSIBLE_FALSE_POS": {
-          "tp": 5,
-          "fp": 9,
-          "fn": 0,
-          "precision": 0.357,
-          "recall": 1.0,
-          "f1": 0.526,
-          "n_injected": 5
-        }
-      },
-      {
-        "value": 0.35,
         "POSSIBLE_WRONG_CLASS": {
           "tp": 5,
           "fp": 4,

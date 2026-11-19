@@ -1,0 +1,18 @@
+{
+  "verdict": {
+    "decision": "Hold",
+    "n_errors": 0,
+    "n_warn_images": 45,
+    "n_images": 205,
+    "warn_ratio": 0.2195,
+    "reasons": [
+      "tỉ lệ ảnh có cảnh báo 21.95% (45/205 ảnh) >= ngưỡng Hold (10.00%)"
+    ]
+  },
+  "reviewed": 80,
+  "budget": 80,
+  "seconds": 11.2,
+  "exported": "D:\\VinUni\\Day9\\K5-L23-Day09-DoHuyKien-2A202603216-AutoQC-Pipeline-Lab\\submission\\export\\clean_v1",
+  "config_sha1": "d703b3ffbe44f39df910be0612fa1aa4acdaba2c",
+  "review_sim_sha1": "7988ca22827f780a7043a2300490e679a1697154"
+}
